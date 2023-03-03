@@ -1,7 +1,7 @@
 # Github informations
 enableGithub = True
 author = "Ted-18"
-repository = "ReactionRole"
+repository = "Bot.Assistant-ReactionRole"
 version = "1.0.0"
 
 
