@@ -1,12 +1,12 @@
-import addons.reactionrole.init as init
+import addons.ReactionRole.init as init
 
-from addons.reactionrole.functions.commands.commandCreate import create
-from addons.reactionrole.functions.commands.commandDelete import delete
-from addons.reactionrole.functions.commands.commandList import list
-from addons.reactionrole.functions.events.eventOnRawReactionAdd import OnRawReactionAdd
-from addons.reactionrole.functions.events.eventOnRawReactionRemove import OnRawReactionRemove
+from addons.ReactionRole.functions.commands.commandCreate import create
+from addons.ReactionRole.functions.commands.commandDelete import delete
+from addons.ReactionRole.functions.commands.commandList import list
+from addons.ReactionRole.functions.events.eventOnRawReactionAdd import OnRawReactionAdd
+from addons.ReactionRole.functions.events.eventOnRawReactionRemove import OnRawReactionRemove
 
-import addons.reactionrole.handlers.handlerDatabaseInit as handlerDatabaseInit
+import addons.ReactionRole.handlers.handlerDatabaseInit as handlerDatabaseInit
 
 # BotAssistant imports
 from services.serviceLogger import consoleLogger as Logger
