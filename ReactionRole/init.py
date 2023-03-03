@@ -4,9 +4,8 @@ author = "Ted-18"
 repository = "Bot.Assistant-ReactionRole"
 version = "1.0.0"
 
-
 # To activate this addon
-cogEnabled = False
+cogEnabled = True
 
 # Name of the addon
 cogName = "reactionrole"
