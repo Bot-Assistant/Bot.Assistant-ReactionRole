@@ -57,3 +57,26 @@ def getReactionRole(serverID):
     
     except Exception as error:
         Logger.error("[HANDLER][REACTIONROLE] DB error getReactionRole -> " + str(error))
+
+
+# Verify if the reaction role id exists
+def checkReactionRoleID(serverID, ID):
+    requestFormat = """
+                    SELECT COUNT(ID)
+                    FROM addon_reactionrole_reactions
+                    WHERE serverID = %s AND ID = %s;
+                    """
+    requestSettings = (serverID, ID)
+    try:
+        result = serviceDatabase.getInfoRequest(requestFormat, requestSettings)
+        
+        if debug == True:
+            Logger.debug("[HANDLER][REACTIONROLE] Checking if the reaction role ID exists -> " + str(serverID) + " " + str(ID))
+            
+        if result[0][0] == 1:
+            return True
+        else:
+            return False
+    
+    except Exception as error:
+        Logger.error("[HANDLER][REACTIONROLE] DB error checkReactionRoleID -> " + str(error))

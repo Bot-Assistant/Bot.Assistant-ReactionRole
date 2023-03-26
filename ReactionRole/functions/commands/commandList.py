@@ -1,86 +1,96 @@
+import os
+from prettytable import PrettyTable
+
 import addons.ReactionRole.handlers.handlerReactionRole as handlerReactionRole
+import addons.ReactionRole.settings.settingColors as settingColors
+import addons.ReactionRole.settings.settingThumbnail as settingThumbnail
+import addons.ReactionRole.settings.settingReactionRole as settingReactionRole
+
 import services.serviceBot as serviceBot
-import services.serviceDiscordLogger as serviceDiscordLogger
-            
-async def list(ctx, page):
-    if ctx.author.guild_permissions.manage_roles:
-        #Listing BDD
-        liste = handlerReactionRole.getReactionRole(ctx.guild.id)
-        
-        if len(liste) == 0:
-            embed = serviceBot.classBot.getDiscord().Embed(title="Reaction Role", description="You have not created any reaction roles.", color=0x00ff00)
-            embedSend = await ctx.respond(embed=embed)
-            return
-        
-        if page == None:
-            page = 1
-        
-        #Message Commande
-        embed = serviceBot.classBot.getDiscord().Embed(title="Reaction Role", description="List of actual reaction role list \n The verification can be long \n \n Tu as sélectionné la page numéro **" + str(page) + "**", color=0x00ff00)
-        embedSend = await ctx.respond(embed=embed)
+discord = serviceBot.classBot.getDiscord()
 
-        #Liste des reaction roles
-        for reaction in liste[page * 25 - 25:page * 25]:
-            
-            #Verification du role
-            guild = serviceBot.classBot.getBot().get_guild(ctx.guild.id)
-            role = serviceBot.classBot.getDiscord().utils.get(guild.roles, id=reaction[3])
-            
-            #Verification du channel
-            try:
-                channel = serviceBot.classBot.getBot().get_channel(int(reaction[1]))
-            except Exception as error:
-                print("[Module][OnRawReactionAdd] Get channel error ->" + error)
-            
 
-            #Si le channel est trouvé
-            if channel != None:
-                #Verification du message
-                try:
-                    message = await channel.fetch_message(reaction[2])                    
-                except Exception as error:
-                    message = None
-                    print("[Module][OnRawReactionAdd] Get message error -> " + str(error))
-            
-            try:
-                #Field du message
+async def list(ctx):
+
+    # PERMISSIONS CHECK
+    import addons.ReactionRole.functions.services.servicePermission as servicePermission
+    if await servicePermission.permissionCheck(ctx, "cmdReactionRoleList") == False:
+        return
     
-                
-                
-                if role == None or channel == None or message == None:
-                    embed.add_field(
-                        name="ID: " + str(reaction[0]), 
 
-                        value="This reaction role is not working ❌ "
-                        +" \n```" 
-                        + "Channel: " + str(reaction[1]) 
-                        + "\nMessage: " + str(reaction[2]) 
-                        + "```", 
-                        
-                        inline=False)
-                else:
-                    embed.add_field(
-                        name="ID: " + str(reaction[0]),
-                        value="This reaction role is working ✅"
-                            +" \n```" 
-                            + "Channel: " + str(channel) 
-                            + "\nMessage: " + str(reaction[2])
-                            + "\nEmoji: " + str(reaction[4])
-                            + "```", 
+    # COMMAND
+    # Get the reaction role from the database
+    list = handlerReactionRole.getReactionRole(ctx.guild.id)
 
-                            inline=False)
-                                        
-                await embedSend.edit_original_response(embed=embed)
-            except Exception as error:
-                print("[Module][OnRawReactionAdd] Edit message error -> " + str(error))
-        
-        #Logs
-        await serviceDiscordLogger.discordLogger.info("The list of reaction roles has been requested by  " + ctx.author.name, ctx.guild.id)
-        
-    else:
-        #Message Commande
-        embed = serviceBot.classBot.getDiscord().Embed(title="Reaction Role", description="You do not have permission to execute this command.", color=0xCD2B2B)
+    # If the list is empty
+    if list == []:
+        embed = discord.Embed(title="Reaction Role", description="No reaction role defined", color=settingColors.red)
+        embed.set_thumbnail(url=settingThumbnail.doubleUpIcons)
         await ctx.respond(embed=embed)
-        
-        #Logs
-        await serviceDiscordLogger.discordLogger.info("The user " + ctx.author.name + " wanted to type the command: /reactionrole list", ctx.guild.id)
+        return
+    
+    # If the list is not empty
+    embed = discord.Embed(title="Reaction Role", description="The loading of the reaction role can take a few seconds.", color=settingColors.blue)
+    embed.set_thumbnail(url=settingThumbnail.doubleUpIcons)
+    await ctx.respond(embed=embed)
+
+    # create a table with all the reaction role with pretty table
+    myTable = PrettyTable(["ID", "Channel", "Message", "Role", "Emoji", "Type", "Active"])
+
+    # Add rows to the table with some verifications
+    # Verify if the channel, message, role and emoji exists
+    for reactionRole in list:
+
+        # Verify if the channel exists
+        channel = discord.utils.get(ctx.guild.channels, id=reactionRole[1])
+        if channel == None:
+            channelResult = settingReactionRole.channelDeleted
+        else:
+            channelResult = channel.name
+
+        # Verify if the message exists
+        try:
+            message = await channel.fetch_message(reactionRole[2])
+            messageResult = message.id
+        except:
+            messageResult = settingReactionRole.messageDeleted
+
+        # Verify if the role exists
+        role = discord.utils.get(ctx.guild.roles, id=reactionRole[3])
+        if role == None:
+            roleResult = settingReactionRole.roleDeleted
+        else:
+            roleResult = role.name
+
+        # Verify the type of reaction
+        if reactionRole[5] == 0:
+            typeResult = settingReactionRole.removeRole
+        elif reactionRole[5] == 1:
+            typeResult = settingReactionRole.addRole
+        elif reactionRole[5] == 2:
+            typeResult = settingReactionRole.addRemoveRole
+
+        # Verify if the reaction role is active
+        if channelResult == settingReactionRole.channelDeleted:
+            active = "🔴"
+        elif messageResult == settingReactionRole.messageDeleted:
+            active = "🔴"
+        elif roleResult == settingReactionRole.roleDeleted:
+            active = "🔴"
+        else:
+            active = "🟢"
+
+
+        # Add the row
+        myTable.add_row([reactionRole[0], channelResult, messageResult, roleResult, reactionRole[4], typeResult, active])
+
+    # If content has more than 1900 characters send it as a file with UTF-8 encoding
+    if len(myTable.get_string()) > 1900:
+        with open("ReactionsRoles.txt", "w", encoding="utf-8") as file:
+            file.write(myTable.get_string())
+        await ctx.send(file=discord.File("ReactionsRoles.txt"))
+        os.remove("ReactionsRoles.txt")
+
+    # If content has less than 1900 characters send it as a message
+    else:
+        await ctx.send(content="`" + myTable.get_string() + "`")
