@@ -89,6 +89,6 @@ class ReactionRole(commands.Cog):
 
 
 def setup(bot):
-    if debug: Logger.debug("Loading Reaction Role")
+    if debug: Logger.debug("Loading cog: " + init.cogName)
     handlerDatabaseInit.databaseInit()
     bot.add_cog(ReactionRole(bot))
