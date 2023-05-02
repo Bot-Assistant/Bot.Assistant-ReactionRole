@@ -42,7 +42,7 @@ class ReactionRole(commands.Cog):
         await eventOnRawReactionRemove.OnRawReactionRemove(payload)
     
     # INIT GROUP COMMAND
-    groupReactionRole = discordCommands.SlashCommandGroup(init.cogName, "Various commands to manage reaction role")
+    groupReactionRole = discordCommands.SlashCommandGroup(init.cogName, "🔶 Group of commands to manage the ReactionRole addon.")
     
     # Verify if the bot has the prerequisites permissions
     @groupReactionRole.command(name="requirements", description="Check the prerequisites permissions of the addon.")
