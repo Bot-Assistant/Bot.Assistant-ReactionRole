@@ -51,8 +51,8 @@ class ReactionRole(commands.Cog):
         await commandRequirements.checkRequirements(ctx)
 
     #t CREATE
-    @groupReactionRole.command(name="create", description="Command to define the roles when users arrive.")
-    async def cmdLogs(
+    @groupReactionRole.command(name="create", description="Command to create a reaction role.")
+    async def cmdCreate(
         self,
         ctx,
         
@@ -67,8 +67,8 @@ class ReactionRole(commands.Cog):
         
         
     #t DELETE
-    @groupReactionRole.command(name="delete", description="Delete a defined reaction role.")
-    async def cmdLogs(
+    @groupReactionRole.command(name="delete", description="Command to delete a reaction role.")
+    async def cmdDelete(
         self,
         ctx,
         id: discord.Option(int, required=True)
@@ -78,8 +78,8 @@ class ReactionRole(commands.Cog):
         
         
     #t LIST
-    @groupReactionRole.command(name="list", description="Get the list of reaction role list.")
-    async def cmdLogs(
+    @groupReactionRole.command(name="list", description="Command to list the reaction roles.")
+    async def cmdList(
         self,
         ctx
     ):
