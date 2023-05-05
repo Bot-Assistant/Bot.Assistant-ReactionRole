@@ -1,5 +1,5 @@
 import services.serviceDatabase as serviceDatabase      
-from services.serviceLogger import consoleLogger as Logger
+from services.serviceLogger import Logger
 
 from settings.settingBot import debug
 
@@ -12,8 +12,7 @@ def createReactionRole(serverID, channelID, messageID, roleID, emote, reactionTy
                     """
     requestSettings = (serverID, channelID, messageID, roleID, emote, reactionType)
     try:
-        if debug == True:
-            Logger.debug("[HANDLER][REACTIONROLE] Reaction role create " + str(serverID) + " " + str(messageID) + " " + str(roleID) + " " + str(emote) + " " + str(reactionType))
+        Logger.debug("[HANDLER][REACTIONROLE] Reaction role create " + str(serverID) + " " + str(messageID) + " " + str(roleID) + " " + str(emote) + " " + str(reactionType))
             
         serviceDatabase.makeRequest(requestFormat, requestSettings)
         
@@ -30,8 +29,7 @@ def deleteReactionRole(serverID, ID):
                     """
     requestSettings = (serverID, ID)
     try:
-        if debug == True:
-            Logger.debug("[HANDLER][REACTIONROLE] Deleting reaction role from the DB " + str(ID))
+        Logger.debug("[HANDLER][REACTIONROLE] Deleting reaction role from the DB " + str(ID))
             
         serviceDatabase.makeRequest(requestFormat, requestSettings)
         
@@ -50,8 +48,7 @@ def getReactionRole(serverID):
     try:
         result = serviceDatabase.getInfoRequest(requestFormat, requestSettings)
         
-        if debug == True:
-            Logger.debug("[HANDLER][REACTIONROLE] Retrieving the list of reaction roles -> " + str(serverID))
+        Logger.debug("[HANDLER][REACTIONROLE] Retrieving the list of reaction roles -> " + str(serverID))
             
         return result
     
@@ -70,8 +67,7 @@ def checkReactionRoleID(serverID, ID):
     try:
         result = serviceDatabase.getInfoRequest(requestFormat, requestSettings)
         
-        if debug == True:
-            Logger.debug("[HANDLER][REACTIONROLE] Checking if the reaction role ID exists -> " + str(serverID) + " " + str(ID))
+        Logger.debug("[HANDLER][REACTIONROLE] Checking if the reaction role ID exists -> " + str(serverID) + " " + str(ID))
             
         if result[0][0] == 1:
             return True
